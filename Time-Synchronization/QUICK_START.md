@@ -223,5 +223,3 @@ python3 continuous_sync_monitor.py --server pool.ntp.org --duration 60
 4. Does sync error change over time?
 5. How does it compare between local server vs public NTP?
 
-**Good luck with your testing! 🚀**
-
