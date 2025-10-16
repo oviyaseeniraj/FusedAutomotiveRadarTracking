@@ -90,8 +90,6 @@ Example:
 
 **Target: < 10 ms** (Milestone #2 goal)
 
-If your sync error is < 10ms, you're on track! 🎉
-
 ---
 
 ## Option B: Public NTP Server Test (Simpler Setup)
@@ -139,14 +137,6 @@ This will:
    ping 192.168.1.100
    ```
 
-### Getting "Command not found: python3"?
-
-Try `python` instead:
-```bash
-python --version  # Check if Python 3.x
-python test_sync_two_devices.py --server pool.ntp.org
-```
-
 ### Results seem inconsistent?
 
 - Use more samples: `--samples 50`
@@ -161,38 +151,6 @@ Just repeat the process on 4 machines:
 2. Run test on all 4 devices
 3. Compare all pairs of offsets
 
----
-
-## Understanding Your Results
-
-### ✓ Good Results (< 10ms sync error)
-- You're meeting the milestone target!
-- Ready to move to optimization phase
-- Document your setup (wired vs wireless, distance, etc.)
-
-### ⚠ Marginal Results (10-20ms)
-- Try wired Ethernet instead of WiFi
-- Reduce network load
-- Take more samples
-- Try 5GHz WiFi if available
-
-### ✗ Poor Results (> 20ms)
-- Check network stability (ping times)
-- Verify no background downloads/uploads
-- Test at different times of day
-- Consider using local server instead of public NTP
-
----
-
-## Next Steps After Successful Test
-
-1. **Document your results** - save the output!
-2. **Test with wireless** - if you did wired, try WiFi
-3. **Try 4 devices** - scale up the testing
-4. **Compare methods** - try different NTP servers or local server
-5. **Prepare for Milestone #2** - start thinking about optimization strategies
-
----
 
 ## Quick Reference: All Commands
 
@@ -212,14 +170,4 @@ python3 test_sync_two_devices.py --server pool.ntp.org --samples 20
 # Continuous monitoring
 python3 continuous_sync_monitor.py --server pool.ntp.org --duration 60
 ```
-
----
-
-## Questions to Answer in Your Testing
-
-1. What is your sync error? (target: < 10ms)
-2. Wired or wireless connection?
-3. How stable is the RTT?
-4. Does sync error change over time?
-5. How does it compare between local server vs public NTP?
 
