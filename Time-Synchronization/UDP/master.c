@@ -10,6 +10,9 @@
 #include <time.h>
 
 
+void pinhigh(void) __attribute__((weak));
+void pinhigh(void) { printf("pin high\n"); }
+
 int main(int argc, char *argv[])
 {
     int sockfd;
@@ -35,6 +38,7 @@ int main(int argc, char *argv[])
     while(1){
         usleep(10000);
         sendto(sockfd, "Hello, World!", 13, 0, (const struct sockaddr *)&servaddr, sizeof(servaddr));
+        pinhigh();
     }
     exit(0);
 }
