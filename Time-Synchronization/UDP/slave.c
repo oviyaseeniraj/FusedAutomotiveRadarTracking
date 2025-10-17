@@ -10,6 +10,10 @@
 #include <arpa/inet.h>
 #include <time.h>
 
+#ifdef JETSON
+    #include <jetgpio.h>
+#endif
+
 volatile sig_atomic_t stop = 0;
 
 /* Hardware hook: pull a pin high when a packet arrives.
@@ -18,7 +22,20 @@ volatile sig_atomic_t stop = 0;
  * implementation (non-weak) to perform the actual GPIO operation.
  */
 void pinhigh(void) __attribute__((weak));
-void pinhigh(void) { printf("pin high\n"); }
+void pinhigh(void) {
+    #ifdef JETSON
+    gpioWrite(7,1);
+    usleep(100);
+    gpioWrite(7,0);
+    #endif
+}
+void setupin(void)  __attribute__((weak));
+void setuopin(void) {
+    #ifdef JETSON
+    gpioSetMode(7, JET_OUTPUT);
+    #endif
+    return;
+}
 
 void handle_sigint(int signo)
 {
