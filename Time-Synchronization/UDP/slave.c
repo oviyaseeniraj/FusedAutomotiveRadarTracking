@@ -30,7 +30,7 @@ void pinhigh(void) {
     #endif
 }
 void setupin(void)  __attribute__((weak));
-void setuopin(void) {
+void setupin(void) {
     #ifdef JETSON
     gpioSetMode(7, JET_OUTPUT);
     #endif
