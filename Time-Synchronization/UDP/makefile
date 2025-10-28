@@ -8,10 +8,10 @@ PROGS = master slave
 all: $(PROGS)
 
 master: master.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@.a $<
 
 slave: slave.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@.a $<
 
 clean:
 	rm -f $(PROGS) *.o
