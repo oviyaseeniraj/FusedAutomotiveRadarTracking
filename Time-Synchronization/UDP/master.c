@@ -12,14 +12,14 @@
     #include <jetgpio.h>
 #endif
 
-
+static char* netmask = "192.168.0.255";
 void pinhigh(void) __attribute__((weak));
 void pinhigh(void) { }
 
 int main(int argc, char *argv[])
 {
     int sockfd;
-    struct sockaddr_in servaddr, servaddr2;
+    struct sockaddr_in servaddr;
 
     // Create UDP socket
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -36,28 +36,20 @@ int main(int argc, char *argv[])
     }
 
     // Set destination addresses
-    const char *dest = (argc > 1) ? argv[1] : "169.231.219.60";
-    const char *dest2 = (argc > 2) ? argv[2] : "169.231.20.38"; /* second IP */
+    // const char *dest = (argc > 1) ? argv[1] : "192.168.0.97";
+    // const char *dest2 = (argc > 2) ? argv[2] : "192.168.0.22"; /* second IP */
+
 
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(8000);
-    if (inet_aton(dest, &servaddr.sin_addr) == 0) {
-        fprintf(stderr, "Invalid destination address: %s\n", dest);
+    if (inet_aton(netmask, &servaddr.sin_addr) == 0) {
+        fprintf(stderr, "Invalid second destination address: %s\n", netmask);
         close(sockfd);
         exit(1);
     }
 
-    memset(&servaddr2, 0, sizeof(servaddr2));
-    servaddr2.sin_family = AF_INET;
-    servaddr2.sin_port = htons(8000);
-    if (inet_aton(dest2, &servaddr2.sin_addr) == 0) {
-        fprintf(stderr, "Invalid second destination address: %s\n", dest2);
-        close(sockfd);
-        exit(1);
-    }
-
-    printf("Sending UDP to %s:8000 and %s:8000\n", dest, dest2);
+    printf("Sending UDP to %s:8000 and %s:8000\n", netmask);
 
     /*
     END BK stuff
@@ -65,8 +57,10 @@ int main(int argc, char *argv[])
 
     while(1){
         usleep(10000);
-        sendto(sockfd, "Hello, World!", 13, 0, (const struct sockaddr *)&servaddr, sizeof(servaddr));
-        sendto(sockfd, "Hello, World!", 13, 0, (const struct sockaddr *)&servaddr2, sizeof(servaddr2));
+        //"broadcasting 50 packets"
+        for(int i=0; i<50; i++){
+            sendto(sockfd, "1", 1, 0, (const struct sockaddr *)&servaddr, sizeof(servaddr));
+        }
     // pinhigh();
     }
     exit(0);
