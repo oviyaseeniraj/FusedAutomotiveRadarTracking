@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chirp - mmWave Radar Tracking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <img src="logo.png" alt="Chirp Logo" class="logo">
+                <span>Chirp</span>
+            </div>
+            <div class="nav-links">
+                <a href="#overview">Overview</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#team">Team</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <img src="logo.png" alt="Chirp Logo" class="hero-logo">
+                <h1 class="hero-title">Chirp</h1>
+                <p class="hero-subtitle">Using mmWave radar nodes to track a moving target's trajectory through multiple FOVs</p>
+                <div class="hero-badge">
+                    <span class="badge-icon">📡</span>
+                    <span>Multi-Node Radar Fusion</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="overview" class="section">
+            <div class="container">
+                <h2 class="section-title">Project Overview</h2>
+                <div class="overview-content">
+                    <p class="lead-text">
+                        As artificial intelligence is embodied into daily, real-world applications, the need for low-cost 
+                        and low-compute methods of determining the kinematics of moving objects in the application environment 
+                        becomes more prevalent to ensure correct operation and safety. Mmwave Radar, offering a small form 
+                        factor and high range resolution could be a suitable alternative to a more mainstream approach like 
+                        computer vision, which is computationally intensive in comparison.
+                    </p>
+                    <p class="lead-text">
+                        Additionally, research has demonstrated that measurements from multiple mmWave radar nodes may be fused 
+                        to accurately determine the relative pose of nodes and resolve the absolute trajectories of objects 
+                        passing through the overlapping field of views of the nodes with higher accuracy.
+                    </p>
+                </div>
+
+                <div class="goals-grid">
+                    <div class="goal-card">
+                        <div class="goal-number">01</div>
+                        <h3>Spatial Calibration</h3>
+                        <p>Accurately determine the relative poses of multiple radars (up to 4) by moving a single object through their FOVs</p>
+                    </div>
+                    <div class="goal-card">
+                        <div class="goal-number">02</div>
+                        <h3>Trajectory Stitching</h3>
+                        <p>Once spatially synchronized, stitch together trajectories of objects moving through the FOVs</p>
+                    </div>
+                    <div class="goal-card">
+                        <div class="goal-number">03</div>
+                        <h3>Real-Time Fusion</h3>
+                        <p>Perform fusion in a real-time field environment with millisecond-level time synchronization</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">How It Works</h2>
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="step-icon">🔄</div>
+                        <div class="step-content">
+                            <h3>Time Synchronization</h3>
+                            <p>Each Jetson communicates with a base station for time synchronization over Wi-Fi</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="step-icon">📡</div>
+                        <div class="step-content">
+                            <h3>Radar Data Acquisition</h3>
+                            <p>Base station commands each Jetson to start frame collection. The AWR board transmits chirps and receives reflections via CSI2 to DCA1000, then to Jetson over Ethernet</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="step-icon">⚡</div>
+                        <div class="step-content">
+                            <h3>Signal Processing Pipeline</h3>
+                            <p>ADC samples undergo sequential processing:</p>
+                            <ul>
+                                <li><strong>Range FFT:</strong> ADC samples → range profile</li>
+                                <li><strong>Doppler FFT:</strong> Chirps per frame → velocity profile</li>
+                                <li><strong>Static Clutter Removal:</strong> Filter out stationary objects</li>
+                                <li><strong>2D OSCFAR:</strong> Detect likely target coordinates</li>
+                                <li><strong>Angle FFT:</strong> Generate range-doppler-angle point clouds</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="step-icon">🎯</div>
+                        <div class="step-content">
+                            <h3>Data Fusion</h3>
+                            <p>Point clouds sent to base station for DBSCAN clustering. Extended Kalman Filter estimates relative radar positions and fuses trajectories across FOVs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="section">
+            <div class="container">
+                <h2 class="section-title">System Architecture</h2>
+                
+                <!-- System Flow Diagram -->
+                <div class="diagram-container">
+                    <svg class="system-diagram" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Base Station -->
+                        <rect x="320" y="20" width="160" height="60" rx="8" fill="#a8c5b8" stroke="#7da693" stroke-width="2"/>
+                        <text x="400" y="55" text-anchor="middle" fill="#2d4a3e" font-weight="600" font-size="16">Base Station</text>
+                        
+                        <!-- Wi-Fi lines to Jetsons -->
+                        <line x1="400" y1="80" x2="200" y2="160" stroke="#9cb8d4" stroke-width="2" stroke-dasharray="5,5"/>
+                        <line x1="400" y1="80" x2="600" y2="160" stroke="#9cb8d4" stroke-width="2" stroke-dasharray="5,5"/>
+                        <text x="280" y="110" fill="#6b8baa" font-size="12">Wi-Fi Sync</text>
+                        <text x="480" y="110" fill="#6b8baa" font-size="12">Wi-Fi Sync</text>
+                        
+                        <!-- Jetson Nodes -->
+                        <rect x="120" y="160" width="160" height="60" rx="8" fill="#9cb8d4" stroke="#6b8baa" stroke-width="2"/>
+                        <text x="200" y="195" text-anchor="middle" fill="#2d3e54" font-weight="600" font-size="16">Jetson Node 1</text>
+                        
+                        <rect x="520" y="160" width="160" height="60" rx="8" fill="#9cb8d4" stroke="#6b8baa" stroke-width="2"/>
+                        <text x="600" y="195" text-anchor="middle" fill="#2d3e54" font-weight="600" font-size="16">Jetson Node 2</text>
+                        
+                        <!-- DCA1000 -->
+                        <rect x="120" y="260" width="160" height="60" rx="8" fill="#f4d67c" stroke="#d9b65d" stroke-width="2"/>
+                        <text x="200" y="295" text-anchor="middle" fill="#5c4d2d" font-weight="600" font-size="16">DCA1000</text>
+                        
+                        <rect x="520" y="260" width="160" height="60" rx="8" fill="#f4d67c" stroke="#d9b65d" stroke-width="2"/>
+                        <text x="600" y="295" text-anchor="middle" fill="#5c4d2d" font-weight="600" font-size="16">DCA1000</text>
+                        
+                        <!-- AWR Radar -->
+                        <rect x="120" y="360" width="160" height="60" rx="8" fill="#a8c5b8" stroke="#7da693" stroke-width="2"/>
+                        <text x="200" y="395" text-anchor="middle" fill="#2d4a3e" font-weight="600" font-size="16">AWR Radar</text>
+                        
+                        <rect x="520" y="360" width="160" height="60" rx="8" fill="#a8c5b8" stroke="#7da693" stroke-width="2"/>
+                        <text x="600" y="395" text-anchor="middle" fill="#2d4a3e" font-weight="600" font-size="16">AWR Radar</text>
+                        
+                        <!-- Connection arrows -->
+                        <path d="M 200 220 L 200 260" stroke="#2d3e54" stroke-width="2" fill="none" marker-end="url(#arrowblue)"/>
+                        <path d="M 600 220 L 600 260" stroke="#2d3e54" stroke-width="2" fill="none" marker-end="url(#arrowblue)"/>
+                        <path d="M 200 320 L 200 360" stroke="#5c4d2d" stroke-width="2" fill="none" marker-end="url(#arrowgreen)"/>
+                        <path d="M 600 320 L 600 360" stroke="#5c4d2d" stroke-width="2" fill="none" marker-end="url(#arrowgreen)"/>
+                        
+                        <!-- Data flow back up -->
+                        <path d="M 220 360 L 220 320" stroke="#7da693" stroke-width="2" fill="none" marker-end="url(#arrowsage)"/>
+                        <path d="M 620 360 L 620 320" stroke="#7da693" stroke-width="2" fill="none" marker-end="url(#arrowsage)"/>
+                        <path d="M 220 260 L 220 220" stroke="#d9b65d" stroke-width="2" fill="none" marker-end="url(#arrowyellow)"/>
+                        <path d="M 620 260 L 620 220" stroke="#d9b65d" stroke-width="2" fill="none" marker-end="url(#arrowyellow)"/>
+                        
+                        <!-- Point clouds to base station -->
+                        <path d="M 280 180 L 320 60" stroke="#7da693" stroke-width="2" fill="none" marker-end="url(#arrowsage)"/>
+                        <path d="M 520 180 L 480 60" stroke="#7da693" stroke-width="2" fill="none" marker-end="url(#arrowsage)"/>
+                        <text x="290" y="120" fill="#7da693" font-size="12">Point Clouds</text>
+                        <text x="420" y="120" fill="#7da693" font-size="12">Point Clouds</text>
+                        
+                        <!-- Target in middle -->
+                        <circle cx="400" cy="480" r="30" fill="#f4d67c" stroke="#d9b65d" stroke-width="3"/>
+                        <text x="400" y="490" text-anchor="middle" fill="#5c4d2d" font-weight="700" font-size="18">🎯</text>
+                        
+                        <!-- Radar waves -->
+                        <path d="M 200 420 Q 300 450 400 460" stroke="#a8c5b8" stroke-width="2" stroke-dasharray="3,3" fill="none"/>
+                        <path d="M 600 420 Q 500 450 400 460" stroke="#a8c5b8" stroke-width="2" stroke-dasharray="3,3" fill="none"/>
+                        
+                        <!-- Arrow markers -->
+                        <defs>
+                            <marker id="arrowblue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#2d3e54"/>
+                            </marker>
+                            <marker id="arrowgreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#2d4a3e"/>
+                            </marker>
+                            <marker id="arrowsage" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#7da693"/>
+                            </marker>
+                            <marker id="arrowyellow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#d9b65d"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+
+                <div class="architecture-diagram">
+                    <div class="arch-layer">
+                        <h3>Hardware Layer</h3>
+                        <div class="arch-components">
+                            <div class="component">AWR Radar</div>
+                            <div class="component">DCA1000</div>
+                            <div class="component">Jetson Orin/Xavier</div>
+                        </div>
+                    </div>
+                    <div class="arch-layer">
+                        <h3>Processing Layer</h3>
+                        <div class="arch-components">
+                            <div class="component">Range FFT</div>
+                            <div class="component">Doppler FFT</div>
+                            <div class="component">Angle FFT</div>
+                            <div class="component">OSCFAR</div>
+                        </div>
+                    </div>
+                    <div class="arch-layer">
+                        <h3>Fusion Layer</h3>
+                        <div class="arch-components">
+                            <div class="component">DBSCAN Clustering</div>
+                            <div class="component">Extended Kalman Filter</div>
+                            <div class="component">Trajectory Estimation</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tech-specs">
+                    <h3>Technical Highlights</h3>
+                    <div class="specs-grid">
+                        <div class="spec-item">
+                            <span class="spec-label">Synchronization</span>
+                            <span class="spec-value">Millisecond precision</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Processing</span>
+                            <span class="spec-value">Real-time pipeline</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Nodes</span>
+                            <span class="spec-value">Up to 4 radar units</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Communication</span>
+                            <span class="spec-value">Wi-Fi + Ethernet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="team" class="section section-alt">
+            <div class="container">
+                <h2 class="section-title">Team</h2>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="member-avatar">OS</div>
+                        <h3>Oviya Seeniraj</h3>
+                        <p>NTP & Time Synchronization</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">AO</div>
+                        <h3>Andrey Otvagin</h3>
+                        <p>Jetson/Node Development</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">VJ</div>
+                        <h3>Vihan Jayaraman</h3>
+                        <p>Wireless Infrastructure</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">WN</div>
+                        <h3>William Ni</h3>
+                        <p>Visualization Development</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">JW</div>
+                        <h3>Jason Wang</h3>
+                        <p>Auto-Calibration Algorithms</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Chirp Project. Built with passion for autonomous systems.</p>
+        </div>
+    </footer>
+</body>
+</html>
+
