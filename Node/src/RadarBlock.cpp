@@ -1,4 +1,8 @@
 #include "RadarBlock.h"
+#include <stdio.h>
+#include <typeinfo>
+#include <iostream>
+#include <chrono>
 
 RadarBlock::RadarBlock(int size_in, int size_out, bool v = false) : outputbuffer(new float[size_out]) {
     inputsize = size_in;
@@ -29,7 +33,7 @@ void RadarBlock::setAngleIndexPointer(int *ptr) {
 }
 
 // Sets the input frame pointer
-void RadarBlock::setFramePointer(uint *ptr) {
+void RadarBlock::setFramePointer(unsigned int *ptr) {
     inputframeptr = ptr;
     lastframe = *ptr;
 }
@@ -40,12 +44,12 @@ float* RadarBlock::getBufferPointer() {
 }
 
 // Retrieve frame pointer
-uint* RadarBlock::getFramePointer() {
+unsigned int* RadarBlock::getFramePointer() {
     return &frame;
 }
 
 // Complete desired calculations / data manipulation
-virtual void RadarBlock::process() {
+void RadarBlock::process() {
     printf("Process done!\n");
 }
 
@@ -54,21 +58,21 @@ void RadarBlock::iteration() {
     for (;;) {
         listen();
         // start timer
-        auto start = chrono::high_resolution_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
         process();
         // stop timer
-        auto stop = chrono::high_resolution_clock::now();
+        auto stop = std::chrono::high_resolution_clock::now();
         if (verbose) {
             // calculate elapsed time in microseconds
-            auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
             // print elapsed time
-            cout << "Elapsed time: " << duration.count() << " microseconds" << endl;
+            std::cout << "Elapsed time: " << duration.count() << " microseconds" << std::endl;
         }
         increment_frame();
     }
 }
 
-virtual void RadarBlock::listen() {
+void RadarBlock::listen() {
     for (;;) {
         if (*inputframeptr != lastframe) {
             lastframe = *inputframeptr;
