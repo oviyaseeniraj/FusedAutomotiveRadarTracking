@@ -1,16 +1,18 @@
 #include "Visualizer.h"
+#include "main.h"
 #include <chrono>
 #include <opencv2/opencv.hpp>
 
-Visualizer::Visualizer(int size_in, int size_out, bool verbose = false) : RadarBlock(size_in, size_out, verbose),
-                                                            image(px_height * height / 2, px_width * width, CV_8UC1, Scalar(255))
+Visualizer::Visualizer(int size_in, int size_out, bool verbose) : RadarBlock(size_in, size_out, verbose),
+                                                                  image(px_height * height / 2, px_width * width, CV_8UC1, cv::Scalar(255))
 {
     frame = 1;
-    namedWindow("Image", WINDOW_NORMAL);
-    setWindowProperty("Image", WND_PROP_FULLSCREEN, WINDOW_NORMAL);
+    cv::namedWindow("Image", cv::WINDOW_NORMAL);
+    cv::setWindowProperty("Image", cv::WND_PROP_FULLSCREEN, cv::WINDOW_NORMAL);
 }
 
-void Visualizer::process() {
+void Visualizer::process()
+{
     auto start = std::chrono::high_resolution_clock::now();
 
     // if(frame <= 1){
@@ -19,7 +21,7 @@ void Visualizer::process() {
     // Add the padded border
     // TOP | BOTTOM | LEFT | RIGHT
     cv::copyMakeBorder(image, borderedImage, borderSize, borderSize, borderLeft, borderRight,
-                        cv::BORDER_CONSTANT, borderColor);
+                       cv::BORDER_CONSTANT, borderColor);
 
     cv::Point zeroZero(0, 0);
     cv::Point maxMax(1080, 632);
@@ -105,7 +107,7 @@ void Visualizer::process() {
     // cv::Point textPosition_ang(borderLeft - 200, (borderedImage.rows-60+4*(textSize.height+24))/2);
     // cv::putText(borderedImage, "F", textPosition_ang, fontFace, fontScale, cv::Scalar(169, 169, 169), thickness);
     cv::Point textPosition_angtxt(borderLeft + 650, (borderedImage.rows - 60 + 2 * (textSize.height + 300)) / 2); // Angle
-                                                                                                                    // cv::putText(borderedImage, "Est. Angle (Degrees)", textPosition_angtxt, cv::FONT_HERSHEY_PLAIN, 1.0, cv::Scalar(169, 169, 169), 2); //  ANGLE VISUALIZER
+                                                                                                                  // cv::putText(borderedImage, "Est. Angle (Degrees)", textPosition_angtxt, cv::FONT_HERSHEY_PLAIN, 1.0, cv::Scalar(169, 169, 169), 2); //  ANGLE VISUALIZER
 
     for (int i = -5; i <= 5; i += 1)
     {
@@ -168,11 +170,11 @@ void Visualizer::process() {
     int cfar_slow = *inputangindexptr / FAST_TIME;
     int cfar_fast = *inputangindexptr % FAST_TIME;
     float rangefloat = *inputrangebuffptr;
-    setprecision(1);
-    std::string anglestr = to_string(anglefloat);
-    std::string slow_str = to_string(cfar_slow);
-    std::string fast_str = to_string(cfar_fast);
-    std::string rangestr = to_string(rangefloat);
+    std::setprecision(1);
+    std::string anglestr = std::to_string(anglefloat);
+    std::string slow_str = std::to_string(cfar_slow);
+    std::string fast_str = std::to_string(cfar_fast);
+    std::string rangestr = std::to_string(rangefloat);
     // std::string fast_str = to_string(*inputangindexptr);  // Testing out the MVDR Angle Estimation
     cv::putText(borderedImage, anglestr, textPosition_slow, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(169, 169, 169), 2);
     // cv::putText(borderedImage, slow_str, textPosition_slow, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(169, 169, 169), 2);
@@ -195,7 +197,7 @@ void Visualizer::process() {
     }
     cv::Point detection1(borderLeft - 100 + cfar_slow * px_width / 2 - px_width / 2, 316 - (cfar_fast * px_height / 2 - px_height / 2));
     cv::Point detection2(borderLeft - 100 + cfar_slow * px_width / 2, 316 - cfar_fast * px_height / 2);
-    cv::rectangle(borderedImage, detection1, detection2, Scalar(169, 169, 169), 3);
+    cv::rectangle(borderedImage, detection1, detection2, cv::Scalar(169, 169, 169), 3);
 
     float angrad = anglefloat * (M_PI / 180);
     int xcoord = 800 + rangefloat * sin(angrad) * 32;
@@ -212,22 +214,24 @@ void Visualizer::process() {
     // cv::Rect roi(borderLeft, borderedImage.row - borderSize, px_width*width, px_height*height);
     // cv::Mat roiImage = borderedImage(roi);
     // Convert the matrix to a color image for visualization
-    applyColorMap(borderedImage, colorImage, COLORMAP_JET);
+    applyColorMap(borderedImage, colorImage, cv::COLORMAP_JET);
     // Display the color image
     imshow("Image", colorImage);
 
     // Waits 1ms
-    waitKey(wait_time);
-    auto stop = chrono::high_resolution_clock::now();
-    auto duration_vis_process = duration_cast<microseconds>(stop - start);
+    cv::waitKey(wait_time);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration_vis_process = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "VIS Process Time " << duration_vis_process.count() << " microseconds" << std::endl;
     frame++;
 }
 
-void setWaitTime(int num) {
+void Visualizer::setWaitTime(int num)
+{
     wait_time = num;
 }
 
-void listen() {
+void Visualizer::listen()
+{
     return;
 }

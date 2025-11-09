@@ -2,7 +2,7 @@
 #define VISUALIZER_H
 
 #include "RadarBlock.h"
-#include <opencv2/core.hpp>
+#include <opencv4/opencv2/core.hpp>
 
 // 1024 x 600
 // Visualizes range-doppler data

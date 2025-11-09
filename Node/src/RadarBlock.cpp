@@ -4,7 +4,7 @@
 #include <iostream>
 #include <chrono>
 
-RadarBlock::RadarBlock(int size_in, int size_out, bool v = false) : outputbuffer(new float[size_out]) {
+RadarBlock::RadarBlock(int size_in, int size_out, bool v) : outputbuffer(new float[size_out]) {
     inputsize = size_in;
     outputsize = size_out;
     verbose = v;

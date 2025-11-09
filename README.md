@@ -10,8 +10,15 @@ Contains the codebase for the end-to-end mmSnap Pipeline containing the blocks f
 - [One-Shot Fusion](#one-shot-fusion)
 
 ## Dependencies
-1. ```brew install opencv``` 
+With Homebrew on MacOS:
+1. `brew install opencv` 
 - should be installed at */opt/homebrew/Cellar/opencv/*/include/opencv4
+
+2. `brew install `
+
+With apt on Linux:
+1. `sudo apt install libfftw3-dev libopencv-dev libeigen3-dev`
+    a. use `dpkg -L <package>` to find the location for include errors
 
 ### Range-Doppler-Angle Processing
 
