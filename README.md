@@ -1,6 +1,26 @@
 # mmSnap
 Codebase for mmSnap: Bayesian One-Shot Fusion in a Self-Calibrated mmWave Radar Network (Accepted for publication at RadarConf 2025)
 
+## How to Set Up Range-Doppler Map Visualizer
+This setup is split into 2 parts: one for the AWR2243 radar board, and one for the DCA1000EVM board. Then, run the visualizer test program. 
+
+### AWR Board:
+1. Change into `Documents/JetsonHardwareSetup/setup_radar/build` directory
+2. Run `./setup_radar`  
+Note: if running into an issue when setting up AWR board, just power cycle it  (setup_radar executable was giving me some error) 
+
+### DCA Board:
+1. Change into `Documents/JetsonHardwareSetup/DCA1000/SourceCode/Release` directory
+2. Run `./DCA1000EVM_CLI_Control fpga DCAconfig.json`
+3. Run `./DCA1000EVM_CLI_Control record DCAconfig.json`  
+    STOP HERE: Have you run `./setup_radar` yet? If not, run that first, then continue.
+4. Run `./DCA1000EVM_CLI_Control start_record DCAconfig.json`
+
+### Run the Visualizer:
+1. Change into `Multi-Node-App/RadarPipeline/test/non_threads`  
+    Note: this Multi-Node-App folder is from Percept's capstone -- we will probably need to change these directions when our Chirp codebase is finalized and built on the Jetsons  
+2. Run `./test`
+
 ## Overview
 Contains the codebase for the end-to-end mmSnap Pipeline containing the blocks for :
 
