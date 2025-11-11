@@ -1,6 +1,6 @@
 #include "JSONTCP.h"
 
-#include <format> //contextually assumed that this is what the process format call wants
+#include <fmt/core.h> //contextually assumed that this is what the process format call wants
 
 // Class for multi-node server comms
 
@@ -104,7 +104,7 @@ void JSON_TCP::process(float angle, float range, auto start_time)
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration_udp_process = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start_time);
     
-    fname = std::format("%s/%s_Frame%d.json", path, node, frame);
+    fname = fmt::format("{}/{}_Frame{}.json", path, node, frame);
     send_file_data(fname, angle, range, duration_udp_process); // Send file to server
     printf("\nFrame Data Sent To Server\n\n");
     frame++;
