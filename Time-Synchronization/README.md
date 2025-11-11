@@ -1,124 +1,141 @@
-# Time Synchronization for Wireless Radar Nodes
+# Run Sync Program
 
-NTP with Kalman filtering for time synchronization between radar nodes over wireless/cellular networks.
-
-**Goal**: Synchronize 2 devices to < 10ms  
-**Hardware**: Jetson Nano 2023 with wireless/cellular connection
-
----
-
-## How to Test 2 Devices
-
-### Setup Device 1 (Time Server)
-
-**Terminal 1 - Start time server (keep running):**
-```bash
-cd Time-Synchronization/NTP
-
-# Find your IP address first
-ifconfig | grep "inet "    # Mac/Linux
-ipconfig                   # Windows
-
-# Start time server
-python3 simple_time_server.py
-```
-
-**Terminal 2 - Test from Device 1:**
-```bash
-cd Time-Synchronization/Testing
-python3 test_sync_two_devices.py --server localhost --samples 30 --device1 "Device-1"
-```
-
-### Test from Device 2
+## SSH into Jetsens
 
 ```bash
-cd Time-Synchronization/Testing
-python3 test_sync_two_devices.py --server <DEVICE_1_IP> --samples 30 --device1 "Device-2"
-```
-*Replace `<DEVICE_1_IP>` with Device 1's actual IP*
+# From your laptop - SSH into Master
+# Password: "fusionsense"
+ssh fusionsense@169.231.215.235
 
-### Calculate Sync Error
-
-```
-Sync Error = |Device1_Mean_Offset - Device2_Mean_Offset|
-
-Example:
-  Device 1 Mean Offset: 45.234 ms
-  Device 1 Mean Delay:  89.123 ms
-  
-  Device 2 Mean Offset: 46.891 ms
-  Device 2 Mean Delay:  91.456 ms
-  
-  Sync Error = |45.234 - 46.891| = 1.657 ms ✓
+# From your laptop - SSH into Slave (different terminal)
+# Password: "password"
+ssh fusionsense@169.231.22.160
 ```
 
----
-
-## Key Features
-
-### Kalman Filtering (NEW)
-- Adaptive filtering for variable network delays
-- Better performance on wireless/cellular connections
-- Automatically reduces trust in high-delay measurements
-- Helps filter out network jitter
-
-### Output Shows
-- **Mean Offset**: Average time difference from reference
-- **Mean Delay**: Average network round-trip delay
-- **Std Dev**: Variability in measurements
-- Both are critical for wireless networks
-
----
-
-## Expected Performance
-
-| Connection | Mean Delay | Sync Accuracy |
-|------------|------------|---------------|
-| Wired LAN | 0.5-2ms | < 2ms |
-| WiFi (local) | 2-10ms | 2-10ms |
-| Cellular | 50-200ms | 5-50ms |
-
-**Note**: Kalman filtering helps achieve better accuracy on cellular (typically 5-20ms vs 50-100ms raw)
-
----
-
-## Troubleshooting
-
-**High sync error (> 50ms)?**
-- Increase samples: `--samples 50` or `--samples 100`
-- Check Mean Delay - if > 200ms, network is unstable
-- Run tests multiple times, network may be congested
-- Consider using GPS sync if outdoor deployment
-
-**Can't connect?**
-- Check firewall (allow port 12300)
-- Verify IP with `ping <ip>`
-- Ensure both devices on same network
-
----
-
-## Quick Commands
+## Copy Scripts to Jetsens
 
 ```bash
-# Find IP
-ifconfig | grep "inet "
+# From your laptop - navigate to project directory
+cd /Users/oseeniraj/Chirp/Time-Synchronization
 
-# Device 1: Start server
-python3 simple_time_server.py
+# Copy NTP files to Master
+scp NTP/CHRONY_SETUP.sh fusionsense@169.231.215.235:~/
 
-# Device 1: Test
-python3 test_sync_two_devices.py --server localhost --samples 30
+# Copy NTP files to Slave
+scp NTP/CHRONY_SETUP.sh NTP/collect_offsets.py NTP/analyze_offsets.py NTP/requirements.txt fusionsense@169.231.22.160:~/
 
-# Device 2: Test
-python3 test_sync_two_devices.py --server <DEVICE_1_IP> --samples 30
+```
+
+## Chrony Setup
+
+On Master Jetson (169.231.215.235):
+```bash
+# SSH in
+ssh fusionsense@169.231.215.235
+
+# Install chrony
+sudo apt-get update
+sudo apt-get install -y chrony
+
+# Configure as master
+sudo bash -c 'cat > /etc/chrony/chrony.conf << EOF
+local stratum 8
+allow 169.231.0.0/16
+logdir /var/log/chrony
+rtcsync
+makestep 1.0 3
+EOF'
+
+# Start chrony
+sudo systemctl restart chrony
+sudo systemctl enable chrony
+
+# Verify
+chronyc tracking
+```
+On Slave Jetson (169.231.22.160):
+```bash
+# SSH in
+ssh fusionsense@169.231.22.160
+
+# Install chrony
+sudo apt-get update
+sudo apt-get install -y chrony
+
+# Configure as slave
+sudo bash -c 'cat > /etc/chrony/chrony.conf << EOF
+server 169.231.215.235 iburst prefer
+pool time.google.com iburst
+logdir /var/log/chrony
+rtcsync
+makestep 1.0 3
+EOF'
+
+# Start chrony
+sudo systemctl restart chrony
+sudo systemctl enable chrony
+
+# Wait 30 seconds, then verify
+sleep 30
+chronyc sources -v
+chronyc tracking
+```
+
+## Run Data Collection Scripts
+On Slave Jetson (169.231.22.160):
+```bash
+# Install Python dependencies via apt (RECOMMENDED for Jetson)
+sudo apt-get update
+sudo apt-get install -y python3-numpy python3-scipy python3-matplotlib
+
+# Verify installation
+python3 -c "import numpy, scipy, matplotlib; print('OK')"
+
+# Alternative: If pip3 is available
+# pip3 install numpy scipy matplotlib
+# Or: pip3 install -r requirements.txt
+
+# Make scripts executable
+chmod +x collect_offsets.py analyze_offsets.py
+
+# Collect 100 samples (takes ~2 minutes)
+python3 collect_offsets.py 100 1.0
+
+# Note the output filename, e.g., offset_data_20251106_194523.json
+
+# Analyze the data
+python3 analyze_offsets.py offset_data_20251106_194523.json
+
+# Or with plots
+python3 analyze_offsets.py offset_data_20251106_194523.json --plot
+```
+
+Copy results back to laptop:
+```bash
+# From your laptop
+scp fusionsense@169.231.22.160:~/offset_data_*.json .
+scp fusionsense@169.231.22.160:~/offset_data_*_summary.json .
+scp fusionsense@169.231.22.160:~/offset_data_*_plot.png .
+
+# Then analyze locally if needed
+python3 analyze_offsets.py offset_data_20251106_194523.json --plot
 ```
 
 ---
 
-## For Better Accuracy (Future)
+## Quick Test Commands
 
-If < 10ms is not achievable on your cellular network:
-1. **GPS/GNSS sync** - Sub-microsecond accuracy, independent of network
-2. **Increase samples** - More samples = better filtering (try 50-100)
-3. **Test at different times** - Network congestion varies
-4. **Use wired connection** for initial testing/validation
+Monitor sync status continuously:
+```bash
+# On slave
+watch -n 1 'chronyc tracking'
+```
+Check if master is reachable:
+```bash
+# On slave
+chronyc sources -v
+```
+Restart if needed:
+```bash
+sudo systemctl restart chrony
+```
