@@ -21,6 +21,13 @@ Note: if running into an issue when setting up AWR board, just power cycle it  (
     Note: this Multi-Node-App folder is from Percept's capstone -- we will probably need to change these directions when our Chirp codebase is finalized and built on the Jetsons  
 2. Run `./test`
 
+## How to Modify Radar Parameters
+Before collecting data on the radar, you probably want to configure settings such as the max range, max Doppler (radial velocity), range resolution, and Doppler resolution that the radar can detect.  
+
+Under `Chirp/Node/setup_radar`, there’s a file called mmwaveconfig.txt; this file contains a bunch of parameters that modify C-style structs in the mmWaveAPI (this API basically just sends data to the radar board to configure settings). These structs are called rlProfileCfg_t, rlChirpCfg_t, etc.  
+
+More in-depth definitions are at this [link](https://astroa.net/fmcw-RADAR/mmwave_sdk/packages/ti/control/mmwavelink/docs/doxygen/html/annotated.html). Under the ‘Data Structures’ tab, look for the struct that you want to modify. Inside of this struct, there are data fields that tell you how to set bits to get the final value that you type into the mmwaveconfig.txt parameter.  
+
 ## Overview
 Contains the codebase for the end-to-end mmSnap Pipeline containing the blocks for :
 
