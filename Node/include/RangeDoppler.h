@@ -67,6 +67,12 @@ class RangeDoppler : public RadarBlock
         // output indices --> {IQ, FAST_TIME, SLOW_TIME, RX, TX}
         void getIndices(int index_1D, int *indices);
 
+        /*
+        * shape_cube() reformats the radar cube, which is a 5D matrix
+        * 'in' has an order like this: frame[Chirp Loop][TX][Sample #][IQ][RX]
+        * 'mid' has an order like this: frame[TX][RX][Chirp Loop][Sample #][IQ]
+        * TODO: what is the difference between 'mid' and 'out' then? 
+        */
         void shape_cube(float *in, float *mid, std::complex<float> *out);
 
         int compute_range_doppler();
