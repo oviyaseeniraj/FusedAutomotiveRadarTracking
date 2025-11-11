@@ -1,3 +1,6 @@
+#ifndef MAIN_H
+#define MAIN_H
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <cstring>
@@ -30,3 +33,5 @@
 #define IP "169.231.217.32" // server IP
 #define SERVER_PORT 1210
 #define MAXLINE 1024
+
+#endif

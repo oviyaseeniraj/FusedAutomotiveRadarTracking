@@ -29,9 +29,9 @@ int DataAcquisition::DataAcquisition::create_bind_socket()
     memset(&cliaddr, 0, sizeof(cliaddr));
 
     // Filling in the servers (DCA1000EVMs) information
-    servaddr.sin_family = AF_INET;         // this means it is a IPv4 address
-    servaddr.sin_addr.s_addr = INADDR_ANY; // sets address to accept incoming messages
-    servaddr.sin_port = htons(PORT);       // port number to accept from
+    servaddr.sin_family = AF_INET;         // sets address family to internet 
+    servaddr.sin_addr.s_addr = INADDR_ANY; // sets server address to IP address of host
+    servaddr.sin_port = htons(PORT);       // port number to accept from, change from little to big endian to fit network byte order
 
     // Now we bind the socket with the servers (DCA1000EVMs) address
     // if (bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
