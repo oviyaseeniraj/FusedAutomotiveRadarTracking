@@ -18,6 +18,7 @@ target_include_directories(fusionsense PUBLIC include)
 target_link_libraries(fusionsense PUBLIC
     fftw3
     fftw3f
+    fmt
     ${OpenCV_LIBS} # I don't understand CMake, but this is the equivalent of the pkg-config call ig
 )
 

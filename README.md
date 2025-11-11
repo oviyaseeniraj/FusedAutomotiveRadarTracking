@@ -17,7 +17,7 @@ With Homebrew on MacOS:
 2. `brew install `
 
 With apt on Linux:
-1. `sudo apt install libfftw3-dev libopencv-dev libeigen3-dev`
+1. `sudo apt install libfftw3-dev libopencv-dev libeigen3-dev libfmt-dev`
     a. use `dpkg -L <package>` to find the location for include errors
 
 ### Range-Doppler-Angle Processing
