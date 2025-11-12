@@ -143,14 +143,26 @@ class JSON_TCP {
 		    frame++;
 		}
 		
-		void end_stream() {
-			memset(&buffer, 0, sizeof(buffer));
-			strcpy(buffer, exit_msg);
-			n = sendto(clientSd, buffer, MAXLINE, 0, (struct sockaddr*)&servaddr, sizeof(servaddr));
-			close(clientSd);
-			printf("Demo Complete!\n");
-			printf("Connection Closed...\n\n");
+	void end_stream() {
+		memset(&buffer, 0, sizeof(buffer));
+		strcpy(buffer, exit_msg);
+		n = sendto(clientSd, buffer, MAXLINE, 0, (struct sockaddr*)&servaddr, sizeof(servaddr));
+		close(clientSd);
+		printf("Demo Complete!\n");
+		printf("Connection Closed...\n\n");
+	}
+	
+	void run_calibration() {
+		printf("\n=== Running Calibration ===\n");
+		// Call Python calibration script with data directory
+		string cmd = format("python3 /home/fusionsense/calibrate.py %s", path);
+		int ret = system(cmd.c_str());
+		if (ret == 0) {
+			printf("Calibration complete! Check %s/calibration_output/\n", path);
+		} else {
+			printf("Calibration failed (exit code: %d)\n", ret);
 		}
+	}
 };
 
 // Base class used for other modules
