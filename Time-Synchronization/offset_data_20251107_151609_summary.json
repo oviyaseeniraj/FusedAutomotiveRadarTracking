@@ -1,0 +1,14 @@
+{
+  "num_samples": 200,
+  "num_samples_filtered": 199,
+  "mean_us": -29.18947,
+  "median_us": -61.641000000000005,
+  "std_us": 125.40551460226578,
+  "trimmed_mean_us": -30.959532663316594,
+  "trimmed_std_us": 123.20286758425146,
+  "min_us": -269.07500000000005,
+  "max_us": 323.053,
+  "outliers_count": 1,
+  "mean_frequency_ppm": 17.848125,
+  "std_frequency_ppm": 0.07882645098569344
+}
