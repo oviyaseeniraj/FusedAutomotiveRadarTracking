@@ -6,6 +6,34 @@ Ultra-simple integration: C++ collects data → Saves to JSON files → Python c
 
 ## Complete Setup Guide for Jetson (Git-Based Workflow)
 
+### Step 0: Time Synchronization (CRITICAL for Multi-Radar Calibration)
+
+Time sync is **essential** for accurate calibration when using multiple radars. The frames must be time-aligned.
+
+**On Patrick's Jetson (169.231.215.235) - Master:**
+```bash
+ssh fusionsense@169.231.215.235
+cd ~/Documents/Chirp/Time-Synchronization
+sudo ./CHRONY_SETUP.sh
+# Select: 1 (Master/Server)
+```
+
+**On Mike's Jetson (169.231.22.160) - Client:**
+```bash
+ssh fusionsense@169.231.22.160
+cd ~/Documents/Chirp/Time-Synchronization
+sudo ./CHRONY_SETUP.sh
+# Select: 2 (Slave/Client)
+# Press Enter to use Patrick (169.231.215.235) as master
+```
+
+**Verify synchronization on Mike's Jetson:**
+```bash
+chronyc tracking
+# Look for: "System time     : 0.000XXX seconds slow/fast of NTP time"
+# Offset should be < 1ms (0.001 seconds)
+```
+
 ### Step 1: Clone/Update Git Repository on Jetson
 
 SSH to Jetson and sync the repository:
