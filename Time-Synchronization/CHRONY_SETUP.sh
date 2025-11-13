@@ -138,6 +138,39 @@ echo "  chronyc sources    - Show time sources"
 echo "  chronyc tracking   - Show sync status and offset"
 echo "  chronyc sourcestats - Show source statistics"
 echo ""
+
+# Compile radar test executable
+echo "=========================================="
+echo "Compiling Radar Test Executable"
+echo "=========================================="
+echo ""
+
+RADAR_DIR="/home/fusionsense/Documents/Chirp/Node/test/non_thread"
+
+if [ -d "$RADAR_DIR" ]; then
+    echo "Found radar directory at: $RADAR_DIR"
+    echo "Compiling test executable..."
+    
+    cd $RADAR_DIR
+    make clean
+    make
+    
+    if [ -f "./test" ]; then
+        echo "✓ Test executable compiled successfully!"
+        echo ""
+        echo "Test executable location: $RADAR_DIR/test"
+    else
+        echo "✗ Compilation failed. Check errors above."
+    fi
+else
+    echo "✗ Radar directory not found at: $RADAR_DIR"
+    echo "  Clone the repo first:"
+    echo "    cd ~/Documents"
+    echo "    git clone https://github.com/oviyaseeniraj/Chirp.git"
+    echo "    cd Chirp && git checkout real-time"
+fi
+
+echo ""
 echo "=========================================="
 echo "Quick Setup Guide:"
 echo "=========================================="
