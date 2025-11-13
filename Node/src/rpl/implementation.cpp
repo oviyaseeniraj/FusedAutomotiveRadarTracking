@@ -41,7 +41,7 @@ class JSON_TCP {
 	FILE* fp;
 	FILE* fp_in;
 	string fname;
-	const char *path = "/home/fusionsense/repos/AVR/RadarPipeline/test/non_thread/frame_data";
+	const char *path = "/home/fusionsense/Documents/Chirp/Node/test/non_thread/frame_data";
 	char buffer[MAXLINE];
 	int n;
 	const char *exit_msg = "Patrick Demo Complete";
