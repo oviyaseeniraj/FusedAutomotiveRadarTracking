@@ -111,7 +111,7 @@ def visualize(trajectory, P_opt, theta_opt, nodes, output_dir):
                     nodes[i], ha='center', fontsize=10)
         
         plt.grid(True)
-        plt.axis('equal')
+        plt.gca().set_aspect('equal', adjustable='box')
         plt.xlabel('X (meters)')
         plt.ylabel('Y (meters)')
         plt.title(f'Calibration Results - {nodes[ref]} Reference Frame')
